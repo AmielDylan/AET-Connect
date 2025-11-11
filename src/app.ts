@@ -9,6 +9,7 @@ import { logger } from '@/utils/logger'
 import registrationRoutes from '@/routes/registration.routes'
 import codesRoutes from '@/routes/codes.routes'
 import authRoutes from '@/routes/auth.routes'
+import eventsRoutes from '@/routes/events.routes'
 
 const app = express()
 
@@ -39,7 +40,7 @@ app.get('/health', (req, res) => {
 app.use('/api/register', registrationRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/codes', codesRoutes)
-// app.use('/api/events', eventsRoutes)
+app.use('/api/events', eventsRoutes)
 // app.use('/api/admin', adminRoutes)
 // app.use('/api/users', usersRoutes)
 // app.use('/api/schools', schoolsRoutes)
@@ -83,6 +84,13 @@ async function startServer() {
     logger.info(`   GET  /api/auth/me - Profil utilisateur`)
     logger.info(`   POST /api/codes/generate - Générer un code`)
     logger.info(`   GET  /api/codes/my-codes - Mes codes`)
+    logger.info(`   POST /api/events - Créer événement`)
+    logger.info(`   GET  /api/events - Liste événements`)
+    logger.info(`   GET  /api/events/:id - Détails événement`)
+    logger.info(`   PATCH /api/events/:id - Modifier événement`)
+    logger.info(`   DELETE /api/events/:id - Supprimer événement`)
+    logger.info(`   POST /api/events/:id/register - S'inscrire`)
+    logger.info(`   DELETE /api/events/:id/unregister - Se désinscrire`)
     logger.info('\n💡 Ready to accept requests!\n')
   })
 }

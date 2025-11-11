@@ -68,3 +68,56 @@ export const RefreshTokenSchema = z.object({
   refresh_token: z.string().min(10, 'Refresh token invalide')
 })
 
+export const CreateEventSchema = z.object({
+  title: z.string().min(5, 'Titre trop court (min 5 caractères)').max(200),
+  description: z.string().max(2000).optional(),
+  event_date: z.string()
+    .refine(
+      (date) => {
+        const eventDate = new Date(date)
+        const now = new Date()
+        return eventDate > now
+      },
+      "La date de l'événement doit être dans le futur"
+    ),
+  city: z.string().min(2).max(100),
+  country: z.string().min(2).max(100),
+  address: z.string().max(500).optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  max_participants: z.number().int().positive().optional()
+})
+
+export const UpdateEventSchema = z.object({
+  title: z.string().min(5).max(200).optional(),
+  description: z.string().max(2000).optional(),
+  event_date: z.string()
+    .refine(
+      (date) => {
+        const eventDate = new Date(date)
+        const now = new Date()
+        return eventDate > now
+      },
+      "La date de l'événement doit être dans le futur"
+    )
+    .optional(),
+  city: z.string().min(2).max(100).optional(),
+  country: z.string().min(2).max(100).optional(),
+  address: z.string().max(500).optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  max_participants: z.number().int().positive().optional(),
+  is_active: z.boolean().optional()
+})
+
+export const EventFiltersSchema = z.object({
+  country: z.string().optional(),
+  city: z.string().optional(),
+  date_from: z.string().optional(),
+  date_to: z.string().optional(),
+  created_by: z.string().uuid().optional(),
+  is_active: z.boolean().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  offset: z.number().int().min(0).optional()
+})
+
