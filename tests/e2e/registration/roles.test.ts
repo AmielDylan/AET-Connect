@@ -1,15 +1,24 @@
-import { supabase } from '../src/config/database'
-import { logger } from '../src/utils/logger'
+import { supabase } from '../../../src/config/database'
+import { logger } from '../../../src/utils/logger'
 
 const API_BASE = 'http://localhost:3001'
 
-async function testAPI(endpoint: string, method: string, body?: any) {
+async function testAPI(endpoint: string, method: string, body?: any, token?: string) {
+  const headers: any = { 'Content-Type': 'application/json' }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body ? JSON.stringify(body) : undefined
   })
   return { status: res.status, data: await res.json() }
+}
+
+async function loginUser(email: string, password: string): Promise<string | null> {
+  const res = await testAPI('/api/auth/login', 'POST', { email, password })
+  return res.data.access_token || null
 }
 
 interface TestResult {
@@ -57,6 +66,18 @@ async function runAllRolesTests() {
   logger.info(`  Admin : ${admin.email} (${admin.max_codes_allowed} codes max)`)
   logger.info('')
   
+  // Obtenir les tokens JWT pour chaque utilisateur
+  logger.info('🔐 Authentification des utilisateurs...')
+  const memberToken = await loginUser('test.membre@aetconnect.com', 'TestPass123!')
+  const ambassadorToken = await loginUser('test.ambassadeur@aetconnect.com', 'TestPass123!')
+  const adminToken = await loginUser('test.admin@aetconnect.com', 'TestPass123!')
+  
+  if (!memberToken || !ambassadorToken || !adminToken) {
+    logger.error('❌ Échec authentification des utilisateurs de test')
+    return
+  }
+  logger.info('✅ Tous les utilisateurs authentifiés\n')
+  
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GROUPE 1 : GÉNÉRATION DE CODES - MEMBRE
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -68,9 +89,7 @@ async function runAllRolesTests() {
   
   let memberCodesGenerated = 0
   for (let i = 1; i <= 3; i++) {
-    const result = await testAPI('/api/codes/generate', 'POST', {
-      user_id: member.id
-    })
+    const result = await testAPI('/api/codes/generate', 'POST', {}, memberToken)
     
     if (result.data.success) {
       memberCodesGenerated++
@@ -101,9 +120,7 @@ async function runAllRolesTests() {
   
   // Test 1.2 : Membre tente 4ème code (devrait échouer)
   logger.info('Test 1.2 : Membre tente 4ème code (devrait échouer)')
-  const test1_2 = await testAPI('/api/codes/generate', 'POST', {
-    user_id: member.id
-  })
+  const test1_2 = await testAPI('/api/codes/generate', 'POST', {}, memberToken)
   
   if (!test1_2.data.success && test1_2.data.error?.includes('limite')) {
     logger.info('✅ PASS - 4ème code rejeté')
@@ -136,9 +153,7 @@ async function runAllRolesTests() {
   
   let ambassadorCodesGenerated = 0
   for (let i = 1; i <= 20; i++) {
-    const result = await testAPI('/api/codes/generate', 'POST', {
-      user_id: ambassador.id
-    })
+    const result = await testAPI('/api/codes/generate', 'POST', {}, ambassadorToken)
     
     if (result.data.success) {
       ambassadorCodesGenerated++
@@ -168,9 +183,7 @@ async function runAllRolesTests() {
   
   // Test 2.2 : Ambassadeur tente 21ème code
   logger.info('Test 2.2 : Ambassadeur tente 21ème code (devrait échouer)')
-  const test2_2 = await testAPI('/api/codes/generate', 'POST', {
-    user_id: ambassador.id
-  })
+  const test2_2 = await testAPI('/api/codes/generate', 'POST', {}, ambassadorToken)
   
   if (!test2_2.data.success && test2_2.data.error?.includes('limite')) {
     logger.info('✅ PASS - 21ème code rejeté')
@@ -202,9 +215,7 @@ async function runAllRolesTests() {
   
   let adminCodesGenerated = 0
   for (let i = 1; i <= 50; i++) {
-    const result = await testAPI('/api/codes/generate', 'POST', {
-      user_id: admin.id
-    })
+    const result = await testAPI('/api/codes/generate', 'POST', {}, adminToken)
     
     if (result.data.success) {
       adminCodesGenerated++

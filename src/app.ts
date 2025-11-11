@@ -8,6 +8,7 @@ import { requestLogger } from '@/middleware/logger.middleware'
 import { logger } from '@/utils/logger'
 import registrationRoutes from '@/routes/registration.routes'
 import codesRoutes from '@/routes/codes.routes'
+import authRoutes from '@/routes/auth.routes'
 
 const app = express()
 
@@ -36,8 +37,8 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/register', registrationRoutes)
+app.use('/api/auth', authRoutes)
 app.use('/api/codes', codesRoutes)
-// app.use('/api/auth', authRoutes)
 // app.use('/api/events', eventsRoutes)
 // app.use('/api/admin', adminRoutes)
 // app.use('/api/users', usersRoutes)
@@ -76,8 +77,12 @@ async function startServer() {
     logger.info(`   POST /api/register/verify-invitation-code`)
     logger.info(`   POST /api/register/complete-registration`)
     logger.info(`   POST /api/register/request-code-from-peer`)
+    logger.info(`   POST /api/auth/login - Connexion`)
+    logger.info(`   POST /api/auth/logout - Déconnexion`)
+    logger.info(`   POST /api/auth/refresh - Rafraîchir token`)
+    logger.info(`   GET  /api/auth/me - Profil utilisateur`)
     logger.info(`   POST /api/codes/generate - Générer un code`)
-    logger.info(`   GET  /api/codes/my-codes/:user_id - Mes codes`)
+    logger.info(`   GET  /api/codes/my-codes - Mes codes`)
     logger.info('\n💡 Ready to accept requests!\n')
   })
 }

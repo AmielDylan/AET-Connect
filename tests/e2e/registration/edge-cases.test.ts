@@ -1,5 +1,5 @@
-import { supabase } from '../src/config/database'
-import { logger } from '../src/utils/logger'
+import { supabase } from '../../../src/config/database'
+import { logger } from '../../../src/utils/logger'
 
 const API_BASE = 'http://localhost:3001'
 

@@ -59,3 +59,12 @@ export const RequestCodeFromPeerSchema = z.object({
   message: z.string().min(10).max(500)
 })
 
+export const LoginSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z.string().min(1, 'Mot de passe requis')
+})
+
+export const RefreshTokenSchema = z.object({
+  refresh_token: z.string().min(10, 'Refresh token invalide')
+})
+

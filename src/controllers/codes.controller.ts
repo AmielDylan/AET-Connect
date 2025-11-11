@@ -6,9 +6,12 @@ export class CodesController {
   
   async generateCode(req: Request, res: Response) {
     try {
-      const { user_id } = req.body
+      if (!req.user) {
+        return res.status(401).json({ error: 'Non authentifié' })
+      }
       
-      // TODO: Récupérer user_id depuis le token JWT (quand auth sera implémenté)
+      // Récupérer user_id depuis le token JWT
+      const user_id = req.user.id
       
       const result = await codesService.generateUserCode(user_id)
       
@@ -30,7 +33,12 @@ export class CodesController {
   
   async getMyCodes(req: Request, res: Response) {
     try {
-      const { user_id } = req.params
+      if (!req.user) {
+        return res.status(401).json({ error: 'Non authentifié' })
+      }
+      
+      // Récupérer user_id depuis le token JWT
+      const user_id = req.user.id
       
       const codes = await codesService.getUserCodes(user_id)
       

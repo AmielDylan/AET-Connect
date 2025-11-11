@@ -1,4 +1,4 @@
-import { logger } from '../src/utils/logger'
+import { logger } from '../../../src/utils/logger'
 
 const API_BASE = 'http://localhost:3001'
 
