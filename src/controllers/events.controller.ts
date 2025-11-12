@@ -61,6 +61,22 @@ export class EventsController {
     }
   }
   
+  async getEventParticipants(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+      
+      const participants = await eventsService.getEventParticipants(id)
+      
+      res.json({
+        participants,
+        total: participants.length
+      })
+    } catch (error: any) {
+      logger.error('Error in getEventParticipants:', error)
+      res.status(500).json({ error: error.message })
+    }
+  }
+  
   async updateEvent(req: Request, res: Response) {
     try {
       if (!req.user) {
@@ -135,7 +151,12 @@ export class EventsController {
     } catch (error: any) {
       logger.error('Error in registerToEvent:', error)
       
-      if (error.message.includes('déjà inscrit') || error.message.includes('complet') || error.message.includes('passé')) {
+      if (error.message.includes('déjà inscrit') || 
+          error.message.includes('complet') || 
+          error.message.includes('passé') ||
+          error.message.includes('terminé') ||
+          error.message.includes('annulé') ||
+          error.message.includes('plus actif')) {
         res.status(400).json({ error: error.message })
       } else if (error.message.includes('non trouvé')) {
         res.status(404).json({ error: error.message })

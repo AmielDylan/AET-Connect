@@ -11,12 +11,14 @@ export class EventsService {
         title: data.title,
         description: data.description || null,
         event_date: data.event_date,
+        event_end_date: data.event_end_date,
         city: data.city,
         country: data.country,
         address: data.address || null,
         latitude: data.latitude || null,
         longitude: data.longitude || null,
         max_participants: data.max_participants || null,
+        status: 'upcoming',
         created_by_user_id: user_id,
         is_active: true
       })
@@ -61,6 +63,10 @@ export class EventsService {
     
     if (filters.created_by) {
       query = query.eq('created_by_user_id', filters.created_by)
+    }
+    
+    if (filters.status) {
+      query = query.eq('status', filters.status)
     }
     
     if (filters.is_active !== undefined) {
@@ -142,15 +148,22 @@ export class EventsService {
     // Récupérer les participants séparément
     const { data: participants } = await supabase
       .from('event_participants')
-      .select(`
-        user:user_id (
-          id,
-          first_name,
-          last_name,
-          avatar_url
-        )
-      `)
+      .select('user_id')
       .eq('event_id', event_id)
+    
+    const participantCount = participants?.length || 0
+    
+    // Récupérer les détails des utilisateurs si nécessaire
+    let participantsDetails: any[] = []
+    if (participantCount > 0) {
+      const userIds = participants.map(p => p.user_id)
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, first_name, last_name, avatar_url')
+        .in('id', userIds)
+      
+      participantsDetails = users || []
+    }
     
     // Vérifier si l'utilisateur est inscrit
     let is_registered = false
@@ -167,10 +180,57 @@ export class EventsService {
     
     return {
       ...event,
-      participant_count: participants?.length || 0,
+      participant_count: participantCount,
       is_registered,
-      participants: participants?.map(p => p.user).filter(Boolean) || []
+      participants: participantsDetails
     }
+  }
+  
+  // Récupérer la liste des participants d'un événement
+  async getEventParticipants(event_id: string) {
+    const { data: participants, error } = await supabase
+      .from('event_participants')
+      .select(`
+        id,
+        registered_at,
+        user_id
+      `)
+      .eq('event_id', event_id)
+      .order('registered_at', { ascending: true })
+    
+    if (error) throw error
+    
+    // Récupérer les détails des utilisateurs séparément
+    const userIds = participants?.map(p => p.user_id) || []
+    
+    if (userIds.length === 0) {
+      return []
+    }
+    
+    const { data: users } = await supabase
+      .from('users')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        email,
+        avatar_url,
+        school_id,
+        entry_year,
+        current_city,
+        current_country,
+        is_ambassador
+      `)
+      .in('id', userIds)
+      .eq('is_active', true)
+    
+    // Combiner les données
+    const participantsMap = new Map(participants?.map(p => [p.user_id, p]) || [])
+    
+    return users?.map(user => ({
+      ...user,
+      registered_at: participantsMap.get(user.id)?.registered_at
+    })) || []
   }
   
   // Mettre à jour un événement
@@ -241,7 +301,7 @@ export class EventsService {
     // Vérifier que l'événement existe et est actif
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select('is_active, max_participants, event_date')
+      .select('is_active, max_participants, status, event_end_date')
       .eq('id', event_id)
       .single()
     
@@ -253,9 +313,18 @@ export class EventsService {
       throw new Error('Cet événement n\'est plus actif')
     }
     
-    // Vérifier que l'événement n'est pas passé
-    if (new Date(event.event_date) < new Date()) {
-      throw new Error('Cet événement est déjà passé')
+    // Vérifier le statut de l'événement
+    if (event.status === 'completed') {
+      throw new Error('Cet événement est terminé')
+    }
+    
+    if (event.status === 'cancelled') {
+      throw new Error('Cet événement est annulé')
+    }
+    
+    // Vérifier que l'événement n'est pas terminé
+    if (new Date(event.event_end_date) < new Date()) {
+      throw new Error('Cet événement est déjà terminé')
     }
     
     // Vérifier que l'utilisateur n'est pas déjà inscrit
@@ -299,10 +368,10 @@ export class EventsService {
   
   // Se désinscrire d'un événement
   async unregisterFromEvent(event_id: string, user_id: string) {
-    // Vérifier que l'événement n'est pas passé
+    // Vérifier le statut de l'événement
     const { data: event } = await supabase
       .from('events')
-      .select('event_date')
+      .select('status, event_end_date')
       .eq('id', event_id)
       .single()
     
@@ -310,8 +379,12 @@ export class EventsService {
       throw new Error('Événement non trouvé')
     }
     
-    if (new Date(event.event_date) < new Date()) {
-      throw new Error('Impossible de se désinscrire d\'un événement passé')
+    if (event.status === 'completed') {
+      throw new Error('Impossible de se désinscrire d\'un événement terminé')
+    }
+    
+    if (new Date(event.event_end_date) < new Date()) {
+      throw new Error('Impossible de se désinscrire d\'un événement terminé')
     }
     
     // Supprimer l'inscription

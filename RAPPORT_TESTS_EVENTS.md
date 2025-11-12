@@ -1,23 +1,26 @@
-# 🎉 Rapport de Tests - Module Events V0
+# 🎉 Rapport Final - Module Events V0
 
 **AET Connect - Backend API**  
-**Date**: 12 novembre 2025 à 00:27  
+**Date**: 12 novembre 2025 à 05:02  
 **Version**: 0.1.0  
-**Environnement**: Development
+**Statut**: ✅ COMPLET (100%)
 
 ---
 
 ## 📋 Vue d'ensemble
 
-Le module Events permet de créer et gérer des événements de networking pour les Anciens Enfants de Troupe. Ce rapport présente l'architecture, les fonctionnalités et les résultats des tests.
+Le module Events permet de créer et gérer des événements de networking pour les Anciens Enfants de Troupe. Ce rapport présente l'architecture complète, toutes les fonctionnalités et les résultats exhaustifs des tests.
 
-### Objectifs du module
+### Objectifs du module ✅
 
 - ✅ Créer des événements de networking
 - ✅ Géolocalisation des événements (latitude/longitude)
+- ✅ Gestion dates début/fin (event_date + event_end_date)
+- ✅ 4 statuts (upcoming/ongoing/completed/cancelled)
 - ✅ Inscriptions avec limite de participants
-- ✅ Filtres multiples (pays, ville, date, créateur)
+- ✅ Filtres multiples (pays, ville, date, créateur, status)
 - ✅ Permissions (créateur ou admin peut modifier/supprimer)
+- ✅ Liste des participants
 
 ---
 
@@ -25,20 +28,38 @@ Le module Events permet de créer et gérer des événements de networking pour 
 
 ### Tests effectués
 
-| Catégorie | Nombre de tests | Réussis | Échoués | Taux |
-|-----------|----------------|---------|---------|------|
-| **Création événements** | 3 | 3 | 0 | 100% |
-| **Récupération événements** | 3 | 3 | 0 | 100% |
-| **Inscriptions/Désinscriptions** | 4 | 4 | 0 | 100% |
-| **Modification/Suppression** | 3 | 3 | 0 | 100% |
-| **TOTAL** | **13** | **13** | **0** | **100%** |
+| Catégorie | Tests | Réussis | Taux |
+|-----------|-------|---------|------|
+| **Tests de base** | 13 | 13 | 100% |
+| **Tests avancés** | 16 | 16 | 100% |
+| **Tests status** | 7 | 7 | 100% |
+| **TOTAL** | **36** | **36** | **100%** ✅ |
 
-### Environnement de test
+### Détail par groupe
 
-- **Base de données**: Supabase (Production)
-- **API**: http://localhost:3001
-- **Framework**: Express.js + TypeScript + JWT
-- **Utilisateur de test**: test.admin@aetconnect.com
+**Tests de base (13)**
+
+- Création événements (3)
+- Récupération événements (3)
+- Inscriptions/Désinscriptions (4)
+- Modification/Suppression (3)
+
+**Tests avancés (16)**
+
+- Limite participants (4)
+- Liste participants (1)
+- Désinscription/Réinscription (4)
+- Permissions modification (2)
+- Permissions suppression (1)
+- Événement passé (1)
+- Filtres avancés (3)
+
+**Tests status (7)**
+
+- Validation dates (2)
+- Status et inscriptions (2)
+- Filtres par status (2)
+- Modification status (1)
 
 ---
 
@@ -46,12 +67,17 @@ Le module Events permet de créer et gérer des événements de networking pour 
 
 ### Base de données
 
-- **Événements créés**: 4
-- **Événements actifs**: 2
+- **Événements créés**: 50
+- **Inscriptions totales**: 26
 - **Pays couverts**: 1
-- **Inscriptions totales**: 0
 
-### Pays avec événements
+### Répartition par status
+
+- **upcoming**: 32
+- **completed**: 6
+- **cancelled**: 12
+
+### Pays avec événements actifs
 
 - France
 
@@ -64,129 +90,72 @@ Le module Events permet de créer et gérer des événements de networking pour 
 **Table `events`**
 
 ```sql
-
 CREATE TABLE events (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title VARCHAR(200) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
   description TEXT,
   event_date TIMESTAMPTZ NOT NULL,
-  city VARCHAR(100) NOT NULL,
-  country VARCHAR(100) NOT NULL,
-  address VARCHAR(500),
-  latitude DECIMAL(10, 8),
-  longitude DECIMAL(11, 8),
+  event_end_date TIMESTAMPTZ NOT NULL,
+  city TEXT NOT NULL,
+  country TEXT NOT NULL,
+  address TEXT,
+  latitude DECIMAL(10,8),
+  longitude DECIMAL(11,8),
   max_participants INTEGER,
-  created_by_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'upcoming'
+    CHECK (status IN ('upcoming', 'ongoing', 'completed', 'cancelled')),
+  created_by_user_id UUID REFERENCES users(id),
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE INDEX idx_events_status ON events(status);
+CREATE INDEX idx_events_dates ON events(event_date, event_end_date);
 ```
 
 **Table `event_participants`**
 
 ```sql
-
 CREATE TABLE event_participants (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_id UUID REFERENCES events(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   registered_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(event_id, user_id)
 );
-
 ```
 
-### Relations
+### Statuts d'événement
 
-- Un événement est créé par un utilisateur (`created_by_user_id`)
-- Un événement peut avoir plusieurs participants (many-to-many)
-- Un utilisateur peut participer à plusieurs événements
-- Contrainte d'unicité : un utilisateur ne peut s'inscrire qu'une fois par événement
+| Status | Description | Inscription | Désinscription |
+|--------|-------------|-------------|----------------|
+| `upcoming` | Événement à venir | ✅ Autorisée | ✅ Autorisée |
+| `ongoing` | Événement en cours | ✅ Autorisée | ✅ Autorisée |
+| `completed` | Événement terminé | ❌ Refusée | ❌ Refusée |
+| `cancelled` | Événement annulé | ❌ Refusée | ❌ Refusée |
 
----
+**Logique de statut** :
 
-## 🧪 Détail des tests
-
-### GROUPE 1 : Création événements (3 tests)
-
-| # | Test | Résultat | Description |
-|---|------|----------|-------------|
-| 1.1 | Créer sans authentification | ✅ PASS | Retourne 401 "Non authentifié" |
-| 1.2 | Créer avec authentification | ✅ PASS | Événement créé avec succès |
-| 1.3 | Créer avec date passée | ✅ PASS | Retourne 400 "Date doit être dans le futur" |
-
-**Validation** : Seuls les utilisateurs authentifiés peuvent créer des événements. Les dates passées sont rejetées.
+- `upcoming` : event_date > maintenant
+- `ongoing` : event_date <= maintenant < event_end_date
+- `completed` : event_end_date < maintenant
+- `cancelled` : défini manuellement par créateur/admin
 
 ---
 
-### GROUPE 2 : Récupération événements (3 tests)
-
-| # | Test | Résultat | Description |
-|---|------|----------|-------------|
-| 2.1 | Liste événements (public) | ✅ PASS | Liste retournée avec filtres par défaut |
-| 2.2 | Détails événement (public) | ✅ PASS | Détails complets + participants |
-| 2.3 | Filtrer par pays | ✅ PASS | Filtre fonctionne correctement |
-
-**Validation** : Les événements sont publics (lecture sans authentification). Les filtres fonctionnent (pays, ville, date, créateur).
-
----
-
-### GROUPE 3 : Inscriptions/Désinscriptions (4 tests)
-
-| # | Test | Résultat | Description |
-|---|------|----------|-------------|
-| 3.1 | S'inscrire sans authentification | ✅ PASS | Retourne 401 "Non authentifié" |
-| 3.2 | S'inscrire avec authentification | ✅ PASS | Inscription réussie |
-| 3.3 | Double inscription | ✅ PASS | Retourne 400 "Déjà inscrit" |
-| 3.4 | Se désinscrire | ✅ PASS | Désinscription réussie |
-
-**Validation** : Les inscriptions nécessitent une authentification. Un utilisateur ne peut s'inscrire qu'une fois par événement. La désinscription fonctionne.
-
----
-
-### GROUPE 4 : Modification/Suppression (3 tests)
-
-| # | Test | Résultat | Description |
-|---|------|----------|-------------|
-| 4.1 | Modifier événement | ✅ PASS | Modification réussie (créateur) |
-| 4.2 | Supprimer événement | ✅ PASS | Soft delete réussi (`is_active=false`) |
-| 4.3 | Vérifier événement inactif | ✅ PASS | Événement bien marqué inactif |
-
-**Validation** : Seuls le créateur ou un admin peuvent modifier/supprimer. La suppression est un soft delete (préserve les données).
-
----
-
-## ✅ Fonctionnalités validées
-
-### Endpoints API (7/7)
+## ✅ Endpoints API (8/8)
 
 | Endpoint | Méthode | Auth | Statut | Description |
 |----------|---------|------|--------|-------------|
 | `/api/events` | POST | ✅ | ✅ | Créer événement |
-| `/api/events` | GET | ❌ | ✅ | Liste événements (public) |
-| `/api/events/:id` | GET | ❌ | ✅ | Détails événement (public) |
-| `/api/events/:id` | PATCH | ✅ | ✅ | Modifier événement (créateur/admin) |
+| `/api/events` | GET | ❌ | ✅ | Liste événements (filtres) |
+| `/api/events/:id` | GET | ❌ | ✅ | Détails événement |
+| `/api/events/:id/participants` | GET | ❌ | ✅ | Liste participants |
+| `/api/events/:id` | PATCH | ✅ | ✅ | Modifier événement |
 | `/api/events/:id` | DELETE | ✅ | ✅ | Supprimer événement (soft delete) |
-| `/api/events/:id/register` | POST | ✅ | ✅ | S'inscrire à un événement |
-| `/api/events/:id/unregister` | DELETE | ✅ | ✅ | Se désinscrire d'un événement |
-
----
-
-## 🌍 Géolocalisation
-
-### Champs disponibles
-
-- `latitude` (DECIMAL 10,8) : Latitude de l'événement
-- `longitude` (DECIMAL 11,8) : Longitude de l'événement
-- `city` (TEXT) : Ville de l'événement
-- `country` (TEXT) : Pays de l'événement
-- `address` (TEXT) : Adresse complète (optionnel)
-
-### Usage futur (Frontend)
-
-Les coordonnées permettront d'afficher les événements sur une carte interactive (Leaflet, Mapbox, Google Maps).
+| `/api/events/:id/register` | POST | ✅ | ✅ | S'inscrire |
+| `/api/events/:id/unregister` | DELETE | ✅ | ✅ | Se désinscrire |
 
 ---
 
@@ -195,9 +164,7 @@ Les coordonnées permettront d'afficher les événements sur une carte interacti
 ### Query parameters
 
 ```
-
-GET /api/events?country=France&city=Paris&date_from=2025-01-01&limit=10
-
+GET /api/events?country=France&status=upcoming&date_from=2025-01-01&limit=10
 ```
 
 | Paramètre | Type | Description |
@@ -206,12 +173,11 @@ GET /api/events?country=France&city=Paris&date_from=2025-01-01&limit=10
 | `city` | string | Filtrer par ville |
 | `date_from` | ISO date | Événements après cette date |
 | `date_to` | ISO date | Événements avant cette date |
+| `status` | enum | Filtrer par status (upcoming/ongoing/completed/cancelled) |
 | `created_by` | UUID | Événements créés par cet utilisateur |
 | `is_active` | boolean | Inclure événements inactifs (admin) |
-| `limit` | number | Nombre max de résultats (défaut: 20) |
+| `limit` | number | Nombre max de résultats (défaut: 20, max: 100) |
 | `offset` | number | Pagination (défaut: 0) |
-
-**Par défaut** : Seuls les événements actifs et futurs sont affichés.
 
 ---
 
@@ -220,6 +186,11 @@ GET /api/events?country=France&city=Paris&date_from=2025-01-01&limit=10
 ### Créer un événement
 
 - ✅ Tout utilisateur authentifié
+
+### Lire les événements
+
+- ✅ Public (pas d'authentification requise)
+- ✅ Liste participants publique
 
 ### Modifier un événement
 
@@ -235,89 +206,204 @@ GET /api/events?country=France&city=Paris&date_from=2025-01-01&limit=10
 ### S'inscrire/Se désinscrire
 
 - ✅ Tout utilisateur authentifié
-- ❌ Impossible de se désinscrire d'un événement passé
+- ❌ Refusé si événement `completed` ou `cancelled`
+- ❌ Impossible de se désinscrire d'un événement terminé
 
 ---
 
 ## 🔒 Validations implémentées
 
-### Création/Modification
+### Création d'événement
 
-- ✅ Titre : min 5 caractères, max 200
-- ✅ Description : max 2000 caractères (optionnel)
-- ✅ Date : doit être dans le futur
-- ✅ Ville : min 2 caractères, max 100
-- ✅ Pays : min 2 caractères, max 100
-- ✅ Latitude : entre -90 et 90 (optionnel)
-- ✅ Longitude : entre -180 et 180 (optionnel)
-- ✅ Max participants : nombre positif (optionnel)
+```typescript
+{
+  title: string (min 5, max 200),
+  description?: string (max 2000),
+  event_date: ISO string (doit être futur),
+  event_end_date: ISO string (doit être futur ET après event_date),
+  city: string (min 2, max 100),
+  country: string (min 2, max 100),
+  address?: string (max 500),
+  latitude?: number (-90 à 90),
+  longitude?: number (-180 à 180),
+  max_participants?: number (positif)
+}
+```
+
+### Modification d'événement
+
+- Tous les champs optionnels
+- Si `event_date` et `event_end_date` fournis, validation de l'ordre
+- Seul le créateur ou un admin peut modifier
 
 ### Inscriptions
 
-- ✅ Événement doit être actif
-- ✅ Événement ne doit pas être passé
+- ✅ Événement doit être actif (`is_active = true`)
+- ✅ Status doit être `upcoming` ou `ongoing`
+- ✅ Événement ne doit pas être terminé (event_end_date > maintenant)
 - ✅ Utilisateur ne peut s'inscrire qu'une fois
-- ✅ Vérification de la limite de participants (si définie)
+- ✅ Vérification limite participants (si définie)
 
 ---
 
 ## 📝 Exemples d'utilisation
 
-### Créer un événement
+### 1. Créer un événement
 
 ```bash
-
 curl -X POST http://localhost:3001/api/events \
   -H "Authorization: Bearer <access_token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Networking AET Connect - Libreville",
-    "description": "Rencontre des anciens du PML basés au Gabon",
-    "event_date": "2026-07-20T18:00:00Z",
-    "city": "Libreville",
-    "country": "Gabon",
-    "address": "Centre culturel français",
-    "latitude": 0.4162,
-    "longitude": 9.4673,
-    "max_participants": 30
+    "title": "Networking AET Connect - Abidjan",
+    "description": "Rencontre des anciens du PML basés en Côte d'Ivoire",
+    "event_date": "2026-08-15T17:00:00Z",
+    "event_end_date": "2026-08-15T22:00:00Z",
+    "city": "Abidjan",
+    "country": "Côte d'Ivoire",
+    "address": "Hôtel Ivoire, Plateau",
+    "latitude": 5.3364,
+    "longitude": -4.0267,
+    "max_participants": 50
   }'
-
 ```
 
-### Liste des événements (public)
+### 2. Liste des événements à venir
 
 ```bash
-
-curl http://localhost:3001/api/events?country=Gabon&limit=10
-
+curl "http://localhost:3001/api/events?status=upcoming&country=France&limit=10"
 ```
 
-### S'inscrire à un événement
+### 3. S'inscrire à un événement
 
 ```bash
-
 curl -X POST http://localhost:3001/api/events/<event_id>/register \
   -H "Authorization: Bearer <access_token>"
-
 ```
+
+### 4. Liste des participants
+
+```bash
+curl http://localhost:3001/api/events/<event_id>/participants
+```
+
+### 5. Modifier un événement (annuler)
+
+```bash
+curl -X PATCH http://localhost:3001/api/events/<event_id> \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "cancelled"
+  }'
+```
+
+---
+
+## 🧪 Détail complet des tests
+
+### GROUPE 1 : Tests de base (13 tests)
+
+**Création événements (3)**
+
+- ✅ Créer sans authentification → 401
+- ✅ Créer avec authentification → 201
+- ✅ Créer avec date passée → 400
+
+**Récupération événements (3)**
+
+- ✅ Liste événements (public) → 200
+- ✅ Détails événement → 200
+- ✅ Filtrer par pays → 200
+
+**Inscriptions/Désinscriptions (4)**
+
+- ✅ S'inscrire sans authentification → 401
+- ✅ S'inscrire avec authentification → 200
+- ✅ Double inscription → 400
+- ✅ Se désinscrire → 200
+
+**Modification/Suppression (3)**
+
+- ✅ Modifier événement → 200
+- ✅ Supprimer événement → 200
+- ✅ Vérifier événement inactif → 200
+
+---
+
+### GROUPE 2 : Tests avancés (16 tests)
+
+**Limite participants (4)**
+
+- ✅ Créer événement avec max_participants = 2
+- ✅ Inscription 1/2
+- ✅ Inscription 2/2
+- ✅ Inscription 3/2 refusée (complet)
+
+**Liste participants (1)**
+
+- ✅ Récupérer liste participants
+
+**Désinscription/Réinscription (4)**
+
+- ✅ Désinscription membre
+- ✅ Vérifier compteur après désinscription
+- ✅ Réinscription réussie (place disponible)
+- ✅ Vérifier limite à nouveau atteinte
+
+**Permissions modification (2)**
+
+- ✅ Membre ne peut pas modifier événement d'admin → 403
+- ✅ Admin peut modifier son propre événement
+
+**Permissions suppression (1)**
+
+- ✅ Admin peut supprimer événement créé par membre
+
+**Événement passé (1)**
+
+- ✅ Inscription à événement passé refusée
+
+**Filtres avancés (3)**
+
+- ✅ Filtre date_from
+- ✅ Filtre created_by
+- ✅ Pagination (limit, offset)
+
+---
+
+### GROUPE 3 : Tests status (7 tests)
+
+**Validation dates (2)**
+
+- ✅ Date fin avant date début → 400
+- ✅ Créer événement avec dates valides + status "upcoming"
+
+**Status et inscriptions (2)**
+
+- ✅ Inscription à événement `completed` → 400
+- ✅ Inscription à événement `cancelled` → 400
+
+**Filtres par status (2)**
+
+- ✅ Filtrer événements `upcoming`
+- ✅ Filtrer événements `completed`
+
+**Modification status (1)**
+
+- ✅ Admin change status en `cancelled`
 
 ---
 
 ## 🐛 Bugs identifiés
 
-Aucun bug critique identifié. Le système fonctionne comme prévu.
+Aucun bug critique. Le système fonctionne parfaitement.
 
 ---
 
 ## 📝 Recommandations
 
-### Court terme (V0)
-
-1. ✅ **Module Events complet** - Prêt pour production
-2. ⏳ **Module Admin** - Gérer demandes d'accès et utilisateurs
-3. ⏳ **Module Users** - Profils et annuaire
-
-### Moyen terme (V1)
+### Court terme (V1)
 
 1. Notifications email/push pour nouveaux événements
 2. Rappels automatiques (J-7, J-1, H-2)
@@ -325,7 +411,7 @@ Aucun bug critique identifié. Le système fonctionne comme prévu.
 4. Photos d'événements (upload + galerie)
 5. Export iCal/Google Calendar
 
-### Long terme (V2)
+### Moyen terme (V2)
 
 1. Événements récurrents (hebdomadaires, mensuels)
 2. Événements payants (intégration Stripe)
@@ -333,13 +419,19 @@ Aucun bug critique identifié. Le système fonctionne comme prévu.
 4. QR codes pour check-in événement
 5. Statistiques avancées (taux de participation, etc.)
 
+### Long terme (V3)
+
+1. IA : suggestions d'événements personnalisées
+2. Matching automatique de participants
+3. Traduction automatique (multilingue)
+4. Streaming live d'événements
+
 ---
 
 ## 👥 Équipe
 
 **Développeur**: Amiel ADJOVI  
-**Projet**: AET Connect - Annuaire panafricain des Anciens Enfants de Troupe  
-**Contact**: [À compléter]
+**Projet**: AET Connect - Annuaire panafricain des Anciens Enfants de Troupe
 
 ---
 
@@ -348,55 +440,62 @@ Aucun bug critique identifié. Le système fonctionne comme prévu.
 ### Commandes de test
 
 ```bash
-
-# Tester le module Events
-
+# Tests de base
 npm run test:e2e:events
 
+# Tests avancés
+npm run test:e2e:events:advanced
+
+# Tests status
+npm run test:e2e:events:status
+
+# Tous les tests Events
+npm run test:e2e:events:complete
+
 # Générer ce rapport
-
 npm run report:events
-
 ```
 
 ### Structure du code
 
 ```
-
 src/
-
 ├── routes/
-
 │   └── events.routes.ts
-
 ├── controllers/
-
 │   └── events.controller.ts
-
 ├── services/
-
 │   └── events.service.ts
-
-└── models/
-
-    └── event.model.ts
+├── models/
+│   └── event.model.ts
+└── utils/
+    └── validations.ts
 
 tests/
-
 └── e2e/
-
     └── events/
+        ├── events-complete.test.ts (13 tests)
+        ├── events-advanced.test.ts (16 tests)
+        └── events-status.test.ts (7 tests)
 
-        └── events-complete.test.ts
-
+scripts/
+├── add-events-fields.ts
+└── generate-events-report.ts
 ```
-
-### Tables Supabase
-
-- `events` - Événements
-- `event_participants` - Inscriptions aux événements
 
 ---
 
-**Fin du rapport** - 12 novembre 2025 à 00:27
+**Fin du rapport** - 12 novembre 2025 à 05:02
 
+---
+
+## 🎉 Module Events V0 - COMPLET
+
+✅ 8 endpoints fonctionnels  
+✅ 36 tests E2E (100%)  
+✅ Gestion dates début/fin  
+✅ 4 statuts gérés  
+✅ Permissions complètes  
+✅ Filtres avancés  
+✅ Géolocalisation  
+✅ Prêt pour production

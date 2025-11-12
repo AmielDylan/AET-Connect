@@ -1,14 +1,18 @@
+export type EventStatus = 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
+
 export interface Event {
   id: string
   title: string
   description: string | null
   event_date: string
+  event_end_date: string
   city: string
   country: string
   address: string | null
   latitude: number | null
   longitude: number | null
   max_participants: number | null
+  status: EventStatus
   created_by_user_id: string
   is_active: boolean
   created_at: string
@@ -45,6 +49,7 @@ export interface CreateEventRequest {
   title: string
   description?: string
   event_date: string
+  event_end_date: string
   city: string
   country: string
   address?: string
@@ -57,12 +62,14 @@ export interface UpdateEventRequest {
   title?: string
   description?: string
   event_date?: string
+  event_end_date?: string
   city?: string
   country?: string
   address?: string
   latitude?: number
   longitude?: number
   max_participants?: number
+  status?: EventStatus
   is_active?: boolean
 }
 
@@ -71,6 +78,7 @@ export interface EventFilters {
   city?: string
   date_from?: string
   date_to?: string
+  status?: EventStatus
   created_by?: string
   is_active?: boolean
   limit?: number

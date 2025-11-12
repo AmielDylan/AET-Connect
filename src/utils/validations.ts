@@ -78,7 +78,16 @@ export const CreateEventSchema = z.object({
         const now = new Date()
         return eventDate > now
       },
-      "La date de l'événement doit être dans le futur"
+      "La date de début doit être dans le futur"
+    ),
+  event_end_date: z.string()
+    .refine(
+      (date) => {
+        const endDate = new Date(date)
+        const now = new Date()
+        return endDate > now
+      },
+      "La date de fin doit être dans le futur"
     ),
   city: z.string().min(2).max(100),
   country: z.string().min(2).max(100),
@@ -86,35 +95,46 @@ export const CreateEventSchema = z.object({
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   max_participants: z.number().int().positive().optional()
-})
+}).refine(
+  (data) => new Date(data.event_end_date) > new Date(data.event_date),
+  {
+    message: "La date de fin doit être après la date de début",
+    path: ["event_end_date"]
+  }
+)
 
 export const UpdateEventSchema = z.object({
   title: z.string().min(5).max(200).optional(),
   description: z.string().max(2000).optional(),
-  event_date: z.string()
-    .refine(
-      (date) => {
-        const eventDate = new Date(date)
-        const now = new Date()
-        return eventDate > now
-      },
-      "La date de l'événement doit être dans le futur"
-    )
-    .optional(),
+  event_date: z.string().optional(),
+  event_end_date: z.string().optional(),
   city: z.string().min(2).max(100).optional(),
   country: z.string().min(2).max(100).optional(),
   address: z.string().max(500).optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   max_participants: z.number().int().positive().optional(),
+  status: z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']).optional(),
   is_active: z.boolean().optional()
-})
+}).refine(
+  (data) => {
+    if (data.event_date && data.event_end_date) {
+      return new Date(data.event_end_date) > new Date(data.event_date)
+    }
+    return true
+  },
+  {
+    message: "La date de fin doit être après la date de début",
+    path: ["event_end_date"]
+  }
+)
 
 export const EventFiltersSchema = z.object({
   country: z.string().optional(),
   city: z.string().optional(),
   date_from: z.string().optional(),
   date_to: z.string().optional(),
+  status: z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']).optional(),
   created_by: z.string().uuid().optional(),
   is_active: z.boolean().optional(),
   limit: z.number().int().min(1).max(100).optional(),

@@ -26,6 +26,12 @@ router.get(
   eventsController.getEventById.bind(eventsController)
 )
 
+// GET /api/events/:id/participants (liste participants, public)
+router.get(
+  '/:id/participants',
+  eventsController.getEventParticipants.bind(eventsController)
+)
+
 // PATCH /api/events/:id (modifier événement, auth requise)
 router.patch(
   '/:id',

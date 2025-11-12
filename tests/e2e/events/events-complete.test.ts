@@ -58,6 +58,7 @@ async function runEventsTests() {
   const test1_1 = await testAPI('/api/events', 'POST', {
     title: 'Rencontre Alumni',
     event_date: '2026-06-15T18:00:00Z',
+    event_end_date: '2026-06-15T21:00:00Z',
     city: 'Paris',
     country: 'France'
   })
@@ -77,6 +78,7 @@ async function runEventsTests() {
     title: 'Networking AET Connect - Paris',
     description: 'Rencontre des anciens élèves basés à Paris',
     event_date: '2026-06-15T18:00:00Z',
+    event_end_date: '2026-06-15T21:00:00Z',
     city: 'Paris',
     country: 'France',
     address: '10 Avenue des Champs-Élysées',
@@ -102,6 +104,7 @@ async function runEventsTests() {
   const test1_3 = await testAPI('/api/events', 'POST', {
     title: 'Événement passé',
     event_date: '2020-01-01T18:00:00Z',
+    event_end_date: '2020-01-01T21:00:00Z',
     city: 'Paris',
     country: 'France'
   }, accessToken)
