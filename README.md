@@ -1,121 +1,65 @@
-# AET Connect - Backend API
+# AET Connect - Full Stack Project
 
-Backend REST API pour AET Connect - Annuaire panafricain des Anciens Enfants de Troupe.
+Annuaire panafricain des Anciens Enfants de Troupe.
 
-## 🚀 Quick Start
+## 📁 Structure du projet
 
-### 1. Installation
+```
+AET Connect/
+├── backend/          # Backend API (Node.js + Express + TypeScript)
+├── frontend/         # Frontend (à venir - Next.js/React)
+└── README.md         # Ce fichier
+```
+
+## 🚀 Backend
+
+Le backend est complet et prêt pour production.
+
+**Version**: 1.0.0  
+**Statut**: ✅ Production Ready
+
+### Modules développés (7/7)
+
+- **Registration** - Inscription et codes d'invitation
+- **Auth** - Authentification JWT
+- **Events** - Gestion des événements
+- **Codes** - Génération de codes d'invitation
+- **Admin** - Dashboard administrateur
+- **Schools** - Informations publiques des écoles
+- **Users** - Annuaire et profils utilisateur
+
+### Statistiques
+
+- **40 endpoints** API REST
+- **139 tests E2E** (100% de réussite)
+- **5 rapports** professionnels
+
+### Documentation
+
+Voir le répertoire `backend/` pour la documentation complète.
+
+### Démarrage rapide
 
 ```bash
+cd backend
 npm install
-```
-
-### 2. Configuration
-
-Créer `.env.local` :
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=your-secret-key
-```
-
-### 3. Test connexion base de données
-
-```bash
-npm run db:test
-```
-
-### 4. Démarrer le serveur
-
-```bash
+cp .env.example .env.local  # Configurer les variables d'environnement
 npm run dev
 ```
 
 Le serveur démarre sur http://localhost:3001
 
-## 📁 Structure
+## 🎨 Frontend
 
-```
-src/
-├── routes/         # Routes API Express
-├── controllers/    # Logique métier
-├── services/       # Services (DB, emails, etc.)
-├── middleware/     # Middlewares Express
-├── models/         # Types TypeScript
-├── utils/          # Utilitaires
-├── config/         # Configuration
-└── app.ts          # Application principale
-```
+À venir - Frontend Next.js/React
 
-## 🗄️ Base de données
+## 📚 Documentation
 
-6 tables Supabase :
+- [Backend Documentation](./backend/README.md)
+- [Rapports de tests](./backend/RAPPORT_TESTS_*.md)
 
-- `schools` - Écoles militaires (9 écoles)
-- `users` - Utilisateurs inscrits
-- `invitation_codes` - Codes d'invitation
-- `access_requests` - Demandes d'accès initiales
-- `events` - Événements de networking
-- `event_participants` - Inscriptions aux événements
+## 👥 Équipe
 
-## 📚 API Endpoints (à développer)
-
-### Registration
-
-- `POST /api/register/check-school-promo`
-- `POST /api/register/request-initial-access`
-- `POST /api/register/verify-invitation-code`
-- `POST /api/register/complete-registration`
-- `POST /api/register/request-code-from-peer`
-
-### Events
-
-- `GET /api/events`
-- `POST /api/events`
-- `GET /api/events/:id`
-- `POST /api/events/:id/register`
-
-### Admin
-
-- `GET /api/admin/access-requests`
-- `POST /api/admin/access-requests/:id/approve`
-- `POST /api/admin/access-requests/:id/reject`
-
-### Users
-
-- `GET /api/users/me`
-- `PATCH /api/users/me`
-- `GET /api/users` (annuaire)
-
-### Schools
-
-- `GET /api/schools`
-- `GET /api/schools/:id`
-
-## 🛠️ Scripts
-
-```bash
-npm run dev          # Développement avec hot-reload
-npm run build        # Build production
-npm start            # Démarrer en production
-npm run db:test      # Tester connexion DB
-npm test             # Tests
-```
-
-## 📝 Développement progressif
-
-1. ✅ Structure de base
-2. ⏳ Module Registration
-3. ⏳ Module Events
-4. ⏳ Module Admin
-5. ⏳ Module Users
-6. ⏳ Module Auth
-
-## 📄 License
-
-MIT
+**Développeur**: Amiel ADJOVI  
+**Projet**: AET Connect - Annuaire panafricain des Anciens Enfants de Troupe
 
