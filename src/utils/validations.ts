@@ -141,3 +141,65 @@ export const EventFiltersSchema = z.object({
   offset: z.number().int().min(0).optional()
 })
 
+// Admin schemas
+export const UpdateUserSchema = z.object({
+  first_name: z.string().min(2).max(100).optional(),
+  last_name: z.string().min(2).max(100).optional(),
+  email: z.string().email().optional(),
+  school_id: z.string().uuid().optional(),
+  entry_year: z.string().length(4).optional(),
+  current_city: z.string().max(100).optional(),
+  current_country: z.string().max(100).optional(),
+  role: z.enum(['alumni', 'moderator', 'admin']).optional(),
+  is_active: z.boolean().optional()
+})
+
+export const IncreaseCodeLimitSchema = z.object({
+  new_limit: z.number().int().min(1).max(1000000)
+})
+
+export const SetAmbassadorSchema = z.object({
+  is_ambassador: z.boolean()
+})
+
+export const AccessRequestFiltersSchema = z.object({
+  status: z.enum(['pending', 'approved', 'rejected']).optional(),
+  school_id: z.string().uuid().optional(),
+  date_from: z.string().optional(),
+  date_to: z.string().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  offset: z.number().int().min(0).optional()
+})
+
+export const UserFiltersSchema = z.object({
+  role: z.enum(['alumni', 'moderator', 'admin']).optional(),
+  school_id: z.string().uuid().optional(),
+  is_active: z.boolean().optional(),
+  is_ambassador: z.boolean().optional(),
+  search: z.string().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  offset: z.number().int().min(0).optional()
+})
+
+// Users schemas
+export const UpdateProfileSchema = z.object({
+  first_name: z.string().min(2).max(100).optional(),
+  last_name: z.string().min(2).max(100).optional(),
+  current_city: z.string().max(100).optional(),
+  current_country: z.string().max(100).optional(),
+  bio: z.string().max(500).optional(),
+  phone: z.string().max(20).optional(),
+  linkedin_url: z.string().url().optional(),
+  avatar_url: z.string().url().optional()
+}).passthrough() // Permet les champs supplémentaires (comme email) qui seront ignorés
+
+export const UpdatePrivacySchema = z.object({
+  show_email: z.boolean().optional(),
+  show_phone: z.boolean().optional(),
+  show_current_location: z.boolean().optional(),
+  show_bio: z.boolean().optional(),
+  show_linkedin: z.boolean().optional(),
+  show_entry_year: z.boolean().optional(),
+  show_in_directory: z.boolean().optional()
+})
+

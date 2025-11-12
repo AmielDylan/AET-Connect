@@ -10,6 +10,9 @@ import registrationRoutes from '@/routes/registration.routes'
 import codesRoutes from '@/routes/codes.routes'
 import authRoutes from '@/routes/auth.routes'
 import eventsRoutes from '@/routes/events.routes'
+import adminRoutes from '@/routes/admin.routes'
+import schoolsRoutes from '@/routes/schools.routes'
+import usersRoutes from '@/routes/users.routes'
 
 const app = express()
 
@@ -41,9 +44,9 @@ app.use('/api/register', registrationRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/codes', codesRoutes)
 app.use('/api/events', eventsRoutes)
-// app.use('/api/admin', adminRoutes)
-// app.use('/api/users', usersRoutes)
-// app.use('/api/schools', schoolsRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/schools', schoolsRoutes)
+app.use('/api/users', usersRoutes)
 
 // Error handling (doit être en dernier)
 app.use(notFoundHandler)
@@ -91,6 +94,18 @@ async function startServer() {
     logger.info(`   DELETE /api/events/:id - Supprimer événement`)
     logger.info(`   POST /api/events/:id/register - S'inscrire`)
     logger.info(`   DELETE /api/events/:id/unregister - Se désinscrire`)
+    logger.info(`   GET  /api/admin/stats - Statistiques admin`)
+    logger.info(`   GET  /api/admin/access-requests - Liste demandes`)
+    logger.info(`   POST /api/admin/access-requests/:id/approve - Approuver demande`)
+    logger.info(`   POST /api/admin/access-requests/:id/reject - Rejeter demande`)
+    logger.info(`   GET  /api/admin/users - Liste utilisateurs`)
+    logger.info(`   PATCH /api/admin/users/:id - Modifier utilisateur`)
+    logger.info(`   POST /api/admin/users/:id/set-ambassador - Désigner ambassadeur`)
+    logger.info(`   PATCH /api/admin/users/:id/increase-code-limit - Augmenter limite`)
+    logger.info(`   GET  /api/admin/events - Liste TOUS les événements`)
+    logger.info(`   GET  /api/admin/events/:id/participants - Participants (admin)`)
+    logger.info(`   PATCH /api/admin/events/:id - Modifier événement (admin)`)
+    logger.info(`   DELETE /api/admin/events/:id - Supprimer événement (admin)`)
     logger.info('\n💡 Ready to accept requests!\n')
   })
 }
