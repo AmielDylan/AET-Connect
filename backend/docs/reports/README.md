@@ -1,51 +1,25 @@
-# 📊 Rapports de tests
+# 📊 Rapports de Tests E2E
 
-Rapports détaillés des tests E2E pour chaque module.
+Ce dossier contient tous les rapports détaillés des tests end-to-end du Backend V1.
 
-## Vue d'ensemble
+## 📁 Rapports disponibles
 
-Tous les modules ont été testés exhaustivement avec des tests E2E.
+| Rapport | Module | Tests | Statut |
+|---------|--------|-------|--------|
+| [RAPPORT_TESTS_REGISTRATION.md](RAPPORT_TESTS_REGISTRATION.md) | Registration | 25 | ✅ 100% |
+| [RAPPORT_TESTS_AUTH.md](RAPPORT_TESTS_AUTH.md) | Auth | 9 | ✅ 100% |
+| [RAPPORT_TESTS_EVENTS.md](RAPPORT_TESTS_EVENTS.md) | Events | 30 | ✅ 100% |
+| [RAPPORT_TESTS_ADMIN.md](RAPPORT_TESTS_ADMIN.md) | Admin | 28 | ✅ 100% |
+| [RAPPORT_TESTS_USERS_SCHOOLS.md](RAPPORT_TESTS_USERS_SCHOOLS.md) | Users & Schools | 23 | ✅ 100% |
+| [RAPPORT_TESTS_E2E_COMPLETS.md](RAPPORT_TESTS_E2E_COMPLETS.md) | Tous modules | 40+ | ✅ 100% |
 
-| Module | Tests | Réussis | Taux |
-|--------|-------|---------|------|
-| Registration | 25 | 25 | 100% |
-| Auth | 9 | 9 | 100% |
-| Events | 30 | 30 | 100% |
-| Admin | 28 | 28 | 100% |
-| Users & Schools | 23 | 23 | 100% |
-| **TOTAL** | **115** | **115** | **100%** |
+## 📈 Statistiques globales
 
-## Rapports disponibles
+- **Total modules testés** : 7
+- **Total tests E2E** : 139+
+- **Taux de réussite** : 100%
+- **Endpoints validés** : 40/40
 
-- [Module Registration](registration.md) - 25 tests
-- [Module Auth](auth.md) - 9 tests
-- [Module Events](events.md) - 30 tests
-- [Module Admin](admin.md) - 28 tests
-- [Modules Users & Schools](users-schools.md) - 23 tests
+## 🔗 Retour à la documentation
 
-## Exécuter les tests
-
-```bash
-# Tous les tests
-npm run test:e2e:v1
-
-# Par module
-npm run test:e2e:registration
-npm run test:e2e:auth
-npm run test:e2e:events
-npm run test:e2e:admin
-npm run test:e2e:schools
-npm run test:e2e:users
-```
-
-## Environnement de test
-
-- **Base de données** : Supabase (Production)
-- **API** : http://localhost:3001
-- **Utilisateurs de test** : Créés automatiquement avec `npm run setup:test-users`
-
-## Prochaines étapes
-
-- [Documentation complète](../README.md)
-- [Référence API](../api-reference/endpoints.md)
-
+[← Documentation principale](../README.md)

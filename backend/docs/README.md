@@ -2,8 +2,6 @@
 
 Bienvenue dans la documentation officielle de **AET Connect**, l'annuaire panafricain des Anciens Enfants de Troupe.
 
-![Build](https://github.com/AmielDylan/AET-Connect/workflows/Backend%20CI/badge.svg)
-![Docs](https://github.com/AmielDylan/AET-Connect/workflows/Deploy%20GitBook%20Documentation/badge.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Tests](https://img.shields.io/badge/tests-139%2F139-success)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
