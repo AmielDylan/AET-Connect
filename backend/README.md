@@ -1,6 +1,22 @@
-# AET Connect - Backend API
+# 🎓 AET Connect - Backend API V1
 
-Backend REST API pour AET Connect - Annuaire panafricain des Anciens Enfants de Troupe.
+![Build](https://github.com/AmielDylan/AET-Connect/workflows/Backend%20CI/badge.svg)
+![Docs](https://github.com/AmielDylan/AET-Connect/workflows/Deploy%20GitBook%20Documentation/badge.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Tests](https://img.shields.io/badge/tests-139%2F139-success)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+Annuaire panafricain des Anciens Enfants de Troupe - API REST complète
+
+📚 **[Documentation complète](https://amieldylan.github.io/AET-Connect/)**
+
+## 🚀 Statistiques
+
+- **40 endpoints** fonctionnels
+- **139 tests E2E** (100% réussite)
+- **7 modules** complets
+- **5 rapports** professionnels
 
 ## 🚀 Quick Start
 

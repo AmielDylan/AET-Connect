@@ -1,0 +1,9 @@
+# GitBook build output
+_book/
+
+# Node modules (si GitBook installé localement)
+node_modules/
+
+# Logs
+*.log
+

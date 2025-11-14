@@ -1,0 +1,57 @@
+{
+  "title": "AET Connect - Documentation API",
+  "description": "Documentation complète de l'API AET Connect - Annuaire panafricain des Anciens Enfants de Troupe",
+  "author": "Amiel ADJOVI (AmielDylan)",
+  "language": "fr",
+  "root": ".",
+  "structure": {
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
+  },
+  "plugins": [
+    "theme-codemirror",
+    "github",
+    "edit-link",
+    "prism",
+    "-highlight",
+    "search",
+    "expandable-chapters",
+    "page-toc-button",
+    "back-to-top-button",
+    "sharing-plus",
+    "copy-code-button",
+    "splitter",
+    "anchors"
+  ],
+  "pluginsConfig": {
+    "github": {
+      "url": "https://github.com/AmielDylan/AET-Connect"
+    },
+    "edit-link": {
+      "base": "https://github.com/AmielDylan/AET-Connect/tree/main/backend/docs",
+      "label": "✏️ Modifier cette page sur GitHub"
+    },
+    "sharing": {
+      "facebook": false,
+      "twitter": true,
+      "linkedin": true,
+      "all": ["twitter", "linkedin", "github"]
+    },
+    "prism": {
+      "css": [
+        "prismjs/themes/prism-tomorrow.css"
+      ],
+      "lang": {
+        "flow": "typescript"
+      }
+    }
+  },
+  "styles": {
+    "website": "styles/website.css"
+  },
+  "variables": {
+    "api_url": "http://localhost:3001",
+    "version": "1.0.0",
+    "github_url": "https://github.com/AmielDylan/AET-Connect"
+  }
+}

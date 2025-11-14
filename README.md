@@ -1,65 +1,65 @@
-# AET Connect - Full Stack Project
+# 🎓 AET Connect
 
-Annuaire panafricain des Anciens Enfants de Troupe.
+Annuaire panafricain des Anciens Enfants de Troupe
 
-## 📁 Structure du projet
+![Build](https://github.com/AmielDylan/AET-Connect/workflows/Backend%20CI/badge.svg)
+![Docs](https://github.com/AmielDylan/AET-Connect/workflows/Deploy%20GitBook%20Documentation/badge.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+## 📚 Documentation
+
+**[📖 Documentation complète](https://amieldylan.github.io/AET-Connect/)**
+
+## 🏗️ Monorepo
+
+Ce projet est organisé en monorepo :
 
 ```
-AET Connect/
-├── backend/          # Backend API (Node.js + Express + TypeScript)
-├── frontend/         # Frontend (à venir - Next.js/React)
-└── README.md         # Ce fichier
+AET-Connect/
+├── backend/      # API REST (Node.js + Express + TypeScript)
+└── frontend/     # Application web (Next.js 14) - À venir
 ```
 
-## 🚀 Backend
-
-Le backend est complet et prêt pour production.
-
-**Version**: 1.0.0  
-**Statut**: ✅ Production Ready
-
-### Modules développés (7/7)
-
-- **Registration** - Inscription et codes d'invitation
-- **Auth** - Authentification JWT
-- **Events** - Gestion des événements
-- **Codes** - Génération de codes d'invitation
-- **Admin** - Dashboard administrateur
-- **Schools** - Informations publiques des écoles
-- **Users** - Annuaire et profils utilisateur
+## 🚀 Backend API
 
 ### Statistiques
 
-- **40 endpoints** API REST
-- **139 tests E2E** (100% de réussite)
-- **5 rapports** professionnels
+- **40 endpoints** REST
+- **139 tests E2E** (100%)
+- **7 modules** complets
+- **Production ready**
 
-### Documentation
-
-Voir le répertoire `backend/` pour la documentation complète.
-
-### Démarrage rapide
+### Quick start
 
 ```bash
 cd backend
 npm install
-cp .env.example .env.local  # Configurer les variables d'environnement
+cp .env.example .env.local
 npm run dev
 ```
 
-Le serveur démarre sur http://localhost:3001
+[📖 Documentation Backend complète](backend/README.md)
 
-## 🎨 Frontend
+## 🎨 Frontend (À venir)
 
-À venir - Frontend Next.js/React
+Application web Next.js 14 avec :
+- Dashboard personnel
+- Annuaire membres
+- Gestion événements
+- Dashboard admin
 
-## 📚 Documentation
+## 🔗 Liens utiles
 
-- [Backend Documentation](./backend/README.md)
-- [Rapports de tests](./backend/RAPPORT_TESTS_*.md)
+- [Documentation API](https://amieldylan.github.io/AET-Connect/)
+- [Backend README](backend/README.md)
+- [Rapports de tests](backend/)
 
-## 👥 Équipe
+## 👨‍💻 Développeur
 
-**Développeur**: Amiel ADJOVI  
-**Projet**: AET Connect - Annuaire panafricain des Anciens Enfants de Troupe
+**Amiel ADJOVI (AmielDylan)**
+
+## 📝 License
+
+MIT License - Copyright (c) 2025 AET Connect
 
