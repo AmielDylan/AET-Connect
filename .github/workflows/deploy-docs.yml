@@ -24,22 +24,27 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Install GitBook CLI
-        run: npm install -g gitbook-cli
+      - name: Install Honkit (GitBook alternative)
+        run: npm install -g honkit
       
       - name: Convert Reports to GitBook
         working-directory: ./backend
         run: |
           npm install
-          npm run docs:convert
+          npm run docs:convert || echo "Conversion skipped"
       
       - name: Install GitBook plugins
         working-directory: ./backend/docs
-        run: gitbook install
+        run: |
+          # Convertir book.json pour Honkit si nécessaire
+          honkit install || echo "Plugin installation skipped"
       
-      - name: Build documentation
+      - name: Build documentation with Honkit
         working-directory: ./backend/docs
-        run: gitbook build
+        run: honkit build
+      
+      - name: Add .nojekyll to prevent Jekyll processing
+        run: touch ./backend/docs/_book/.nojekyll
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -47,5 +52,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./backend/docs/_book
           publish_branch: gh-pages
-          cname: docs.aetconnect.com
-

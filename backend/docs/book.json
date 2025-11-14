@@ -9,19 +9,14 @@
     "summary": "SUMMARY.md"
   },
   "plugins": [
-    "theme-codemirror",
+    "search",
+    "back-to-top-button",
+    "expandable-chapters",
     "github",
     "edit-link",
     "prism",
     "-highlight",
-    "search",
-    "expandable-chapters",
-    "page-toc-button",
-    "back-to-top-button",
-    "sharing-plus",
-    "copy-code-button",
-    "splitter",
-    "anchors"
+    "sharing-plus"
   ],
   "pluginsConfig": {
     "github": {
