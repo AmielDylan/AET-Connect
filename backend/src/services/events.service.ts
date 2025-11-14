@@ -155,7 +155,7 @@ export class EventsService {
     
     // Récupérer les détails des utilisateurs si nécessaire
     let participantsDetails: any[] = []
-    if (participantCount > 0) {
+    if (participantCount > 0 && participants) {
       const userIds = participants.map(p => p.user_id)
       const { data: users } = await supabase
         .from('users')
